@@ -4,6 +4,9 @@
     "description": "",
     "type": "module",
     "main": "index.js",
+    "engines": {
+        "node": ">=18 <19"
+    },
     "scripts": {
         "dev": "env-cmd -f src/config/dev.env nodemon src/index.js",
         "start": "node src/index.js"
