@@ -1,0 +1,22 @@
+{
+    "name": "kme-test-bot",
+    "version": "1.0.0",
+    "description": "",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "dev": "env-cmd -f src/config/dev.env nodemon src/index.js",
+        "start": "node src/index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "discord.js": "^14.11.0",
+        "moment": "^2.29.4"
+    },
+    "devDependencies": {
+        "env-cmd": "^10.1.0",
+        "nodemon": "^3.0.1"
+    }
+}
