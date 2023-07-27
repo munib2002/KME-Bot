@@ -52,11 +52,12 @@ const main = async () => {
         }
 
         if (interaction.commandName === COMMANDS.FBAN) {
-            await interaction.reply('Its Not Ready yet!!!!!!!!! :punch:');
+            await interaction.reply(`<@${interaction.options.get('user').value}> has been banned from the server!`);
         }
     });
 
     client.login(process.env.TOKEN);
 };
+
 
 main();
