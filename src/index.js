@@ -1,7 +1,11 @@
-import { REST, Routes, Client, GatewayIntentBits, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import moment from 'moment';
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+import { COMMANDS } from './constants/commands';
+import { loadCommands } from './utils/discord.utils';
+
+const { OWNER_ID } = process.env;
+
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 });
@@ -9,44 +13,32 @@ const client = new Client({
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}!`));
 
 const main = async () => {
-    const commands = [
-        new SlashCommandBuilder()
-            .setName('member-stats')
-            .setDescription('Replies with member stats!')
-            .setDefaultMemberPermissions(PermissionFlagsBits.MuteMembers)
-            .toJSON(),
-        new SlashCommandBuilder()
-            .setName('fban')
-            .setDescription('Replies with member stats!')
-            .setDefaultMemberPermissions(PermissionFlagsBits.MuteMembers)
-            .toJSON(),
-    ];
+    await loadCommands();
 
-    try {
-        console.log('Started refreshing application (/) commands.');
+    let msg;
 
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
+    setInterval(async () => {
+        if (msg) {
+            await msg.delete();
+        }
 
-        console.log('Successfully reloaded application (/) commands.');
-    } catch (error) {
-        console.error(error);
-    }
-
-    let members;
+        msg = await (await client.users.fetch(OWNER_ID)).send('Bot is up and running!');
+    }, 1000 * 60 * 10);
 
     client.on('interactionCreate', async interaction => {
         if (!interaction.isChatInputCommand()) return;
 
-        if (interaction.commandName === 'member-stats') {
-            if (interaction.user.id !== '543805299090522112') {
-                return await interaction.reply(
-                    'You are not Strong enough to use this command. The only one worthy is <@543805299090522112>. :smiling_imp:',
-                );
-            }
+        if (interaction.commandName === COMMANDS.MEMBER_STATS) {
             try {
+                if (interaction.user.id !== OWNER_ID) {
+                    return await interaction.reply(
+                        `You are not Strong enough to use this command. The only one worthy is <@${OWNER_ID}>. :smiling_imp:`,
+                    );
+                }
+
                 await interaction.deferReply({ ephemeral: false });
 
-                members = (await interaction.guild.members.fetch()).filter(c => !c.user.bot);
+                let members = (await interaction.guild.members.fetch()).filter(c => !c.user.bot);
 
                 const alts = members.filter(c => moment().diff(moment(c.user.createdAt), 'days') < 60);
 
@@ -63,12 +55,13 @@ const main = async () => {
                         .join('  ')}`,
                 );
             } catch (e) {
+                await interaction.followUp('Something went wrong!');
+
                 console.log(e);
             }
         }
 
-        if (interaction.commandName === 'fban') {
-            
+        if (interaction.commandName === COMMANDS.FBAN) {
             await interaction.reply('Its Not Ready yet!!!!!!!!! :punch:');
         }
     });
