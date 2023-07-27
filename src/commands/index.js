@@ -12,9 +12,8 @@ export const commands = [
     new SlashCommandBuilder()
         .setName(COMMANDS.FBAN)
         .setDescription('Fake Bans User')
-        .addUserOption(option => option.setName('user').setDescription('The user to ban').setRequired(true))
+        .addUserOption(option => option.setName('user').setDescription('The user to ban').setRequired(false))
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false)
         .toJSON(),
 ];
-

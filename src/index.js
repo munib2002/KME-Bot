@@ -52,12 +52,15 @@ const main = async () => {
         }
 
         if (interaction.commandName === COMMANDS.FBAN) {
+            const userID = interaction.options.get('user')?.value;
+
+            if (!userID) return await interaction.reply('Usage **/fban @user** to ban a user!');
+
             await interaction.reply(`<@${interaction.options.get('user').value}> has been banned from the server!`);
         }
     });
 
     client.login(process.env.TOKEN);
 };
-
 
 main();
