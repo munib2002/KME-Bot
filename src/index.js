@@ -15,16 +15,6 @@ client.on('ready', () => console.log(`Logged in as ${client.user.tag}!`));
 const main = async () => {
     await loadCommands();
 
-    let msg;
-
-    setInterval(async () => {
-        if (msg) {
-            await msg.delete();
-        }
-
-        msg = await (await client.users.fetch(OWNER_ID)).send('Bot is up and running!');
-    }, 1000 * 60 * 10);
-
     client.on('interactionCreate', async interaction => {
         if (!interaction.isChatInputCommand()) return;
 
