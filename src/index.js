@@ -67,7 +67,8 @@ const main = async () => {
 
         if (!message.content.startsWith(prefix)) return;
 
-        if (message.author.id !== OWNER_ID) return await message.reply('No!');
+        if (message.author.id !== OWNER_ID)
+            return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
 
@@ -80,21 +81,24 @@ const main = async () => {
             const memberId = args[0]?.replace(/[<@!>]/g, '');
 
             if (!memberId)
-                return await message.reply('Usage **.va [user]** to validate a user!', { allowedMentions: { repliedUser: false } });
+                return await message.reply({
+                    content: 'Usage **.va [user]** to validate a user!',
+                    allowedMentions: { repliedUser: false },
+                });
 
             const memberToValidate = message.guild.members.cache.get(memberId);
 
-            if (!memberToValidate) return await message.reply('User not found!', { allowedMentions: { repliedUser: false } });
+            if (!memberToValidate) return await message.reply({ content: 'User not found!', allowedMentions: { repliedUser: false } });
 
             if (memberToValidate.roles.cache.has(validatedRoleId))
-                return await message.reply('User already validated!', { allowedMentions: { repliedUser: false } });
+                return await message.reply({ content: 'User already validated!', allowedMentions: { repliedUser: false } });
 
             try {
                 await memberToValidate.roles.add(validatedRoleId);
 
-                await message.reply(`<@${memberId}> validated for Pickups!`, { allowedMentions: { repliedUser: false } });
+                await message.reply({ content: `<@${memberId}> validated for Pickups!`, allowedMentions: { repliedUser: false } });
             } catch (e) {
-                await message.reply('Not enough permissions!', { allowedMentions: { repliedUser: false } });
+                await message.reply({ content: 'Not enough permissions!', allowedMentions: { repliedUser: false } });
                 console.log(e);
             }
         }
