@@ -67,14 +67,14 @@ const main = async () => {
 
         if (!message.content.startsWith(prefix)) return;
 
-        if (message.author.id !== OWNER_ID)
-            return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
-
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
 
         const command = args.shift().toLowerCase();
 
         if (command === 'va') {
+            if (message.author.id !== OWNER_ID)
+                return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
+
             // const validatedRoleId = '865990741754773534';
             const validatedRoleId = '1095363733750022197';
 
