@@ -10,6 +10,8 @@ const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 });
 
+const prefix = '.';
+
 client.on('ready', () => console.log(`Logged in as ${client.user.tag}!`));
 
 const main = async () => {
@@ -57,6 +59,44 @@ const main = async () => {
             if (!userID) return await interaction.reply('Usage **/fban @user** to ban a user!');
 
             await interaction.reply(`<@${interaction.options.get('user').value}> has been banned from the server!`);
+        }
+    });
+
+    client.on('messageCreate', async message => {
+        if (message.author.bot) return;
+
+        if (!message.content.startsWith(prefix)) return;
+
+        if (message.author.id !== OWNER_ID) return await message.reply('No!');
+
+        const args = message.content.slice(prefix.length).trim().split(/ +/g);
+
+        const command = args.shift().toLowerCase();
+
+        if (command === 'va') {
+            // const validatedRoleId = '865990741754773534';
+            const validatedRoleId = '1095363733750022197';
+
+            const memberId = args[0]?.replace(/[<@!>]/g, '');
+
+            if (!memberId)
+                return await message.reply('Usage **.va [user]** to validate a user!', { allowedMentions: { repliedUser: false } });
+
+            const memberToValidate = message.guild.members.cache.get(memberId);
+
+            if (!memberToValidate) return await message.reply('User not found!', { allowedMentions: { repliedUser: false } });
+
+            if (memberToValidate.roles.cache.has(validatedRoleId))
+                return await message.reply('User already validated!', { allowedMentions: { repliedUser: false } });
+
+            try {
+                await memberToValidate.roles.add(validatedRoleId);
+
+                await message.reply(`<@${memberId}> validated for Pickups!`, { allowedMentions: { repliedUser: false } });
+            } catch (e) {
+                await message.reply('Not enough permissions!', { allowedMentions: { repliedUser: false } });
+                console.log(e);
+            }
         }
     });
 
