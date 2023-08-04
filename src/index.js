@@ -27,9 +27,7 @@ const main = async () => {
         if (interaction.commandName === COMMANDS.MEMBER_STATS) {
             try {
                 if (interaction.user.id !== OWNER_ID) {
-                    return await interaction.reply(
-                        `You are not Strong enough to use this command. The only one worthy is <@${OWNER_ID}>. :smiling_imp:`,
-                    );
+                    return await interaction.reply(`Not Ready Yet. Ask <@${OWNER_ID}> for more info!`);
                 }
 
                 await interaction.deferReply({ ephemeral: false });
