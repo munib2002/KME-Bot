@@ -21,7 +21,13 @@ const client = new Client({
 
 const prefix = '.';
 
-client.on('ready', () => console.log(`Logged in as ${client.user.tag}!`));
+client.on('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+
+    console.log('Fetching all members...');
+    await Promise.all(client.guilds.cache.map(async guild => await guild.members.fetch()));
+    console.log('Fetched all members!');
+});
 
 const main = async () => {
     await loadCommands();
