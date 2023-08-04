@@ -10,8 +10,10 @@ const starRoleId = '1095679588740378624';
 const adminRoleId = '1096354067850215544';
 const moderatorRoleId = '1095361485221404765';
 
-// const queueChannelId = '826063908342595607';
-const queueChannelId = '1095360184559349820';
+const queueChannelId = process.env.QUEUE_CHANNEL_ID || '1095360184559349820';
+const validatedRoleId = process.env.VALIDATED_ROLE_ID || '1095363733750022197';
+const blacklistedRoleId = process.env.BLACKLISTED_ROLE_ID || '1095640720456564736';
+const inspectionRoleId = process.env.INSPECTION_ROLE_ID || '1119157862044807208';
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
@@ -87,13 +89,10 @@ const main = async () => {
             )
                 return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
-            // const validatedRoleId = '865990741754773534';
-            const validatedRoleId = '1095363733750022197';
-
             const memberId = args[0]?.replace(/[<@!>]/g, '');
 
             if (!memberId) {
-                embed.setTitle('Usage').setDescription('**.va [user]** to validate a user!').setColor('#F08A5D');
+                embed.setTitle('Usage').setDescription('**.va [user]** to validate a user').setColor('#F08A5D');
 
                 return await message.channel.send({ embeds: [embed] });
             }
@@ -107,7 +106,7 @@ const main = async () => {
             }
 
             if (memberToValidate.roles.cache.has(validatedRoleId)) {
-                embed.setDescription(`<@${memberId}> is already validated!`);
+                embed.setDescription(`<@${memberId}> is already validated`);
 
                 return await message.channel.send({ embeds: [embed] });
             }
@@ -118,6 +117,120 @@ const main = async () => {
                 embed.setDescription(
                     `<@${memberId}> has been successfully validated for Pickups!\nHead over to <#${queueChannelId}> to play!`,
                 );
+
+                await message.channel.send({ embeds: [embed] });
+            } catch (e) {
+                embed.setDescription(`Something went wrong! Contact <@${OWNER_ID}> for Help`).setColor('#ff1744');
+
+                await message.channel.send({ embeds: [embed] });
+
+                console.log(e);
+            }
+        }
+
+        if (command === 'bl') {
+            const embed = new EmbedBuilder().setTitle('Blacklist').setColor('#18ffff');
+
+            if (
+                message.author.id !== OWNER_ID &&
+                !message.member.roles.cache.has(adminRoleId) &&
+                !message.member.roles.cache.has(moderatorRoleId) &&
+                !message.member.roles.cache.has(starRoleId)
+            )
+                return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
+
+            const memberId = args[0]?.replace(/[<@!>]/g, '');
+
+            if (!memberId) {
+                embed.setTitle('Usage').setDescription('**.bl [user]** to blacklist a user').setColor('#F08A5D');
+
+                return await message.channel.send({ embeds: [embed] });
+            }
+
+            const memberToValidate = message.guild.members.cache.get(memberId);
+
+            if (!memberToValidate) {
+                embed.setDescription('User not found!').setColor('#ff1744');
+
+                return await message.channel.send({ embeds: [embed] });
+            }
+
+            if (memberToValidate.roles.cache.has(blacklistedRoleId)) {
+                embed.setDescription(`<@${memberId}> is already blacklisted`);
+
+                return await message.channel.send({ embeds: [embed] });
+            }
+
+            try {
+                await memberToValidate.roles.add(blacklistedRoleId);
+
+                embed.setDescription(`<@${memberId}> blacklisted`);
+
+                await message.channel.send({ embeds: [embed] });
+            } catch (e) {
+                embed.setDescription(`Something went wrong! Contact <@${OWNER_ID}> for Help`).setColor('#ff1744');
+
+                await message.channel.send({ embeds: [embed] });
+
+                console.log(e);
+            }
+        }
+
+        if (command === 'bvs') {
+            const embed = new EmbedBuilder().setTitle('Inspection').setColor('#18ffff');
+
+            if (
+                message.author.id !== OWNER_ID &&
+                !message.member.roles.cache.has(adminRoleId) &&
+                !message.member.roles.cache.has(moderatorRoleId) &&
+                !message.member.roles.cache.has(starRoleId)
+            )
+                return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
+
+            const memberId = args[0]?.replace(/[<@!>]/g, '');
+            const option = args[1] || '+';
+
+            if (!memberId || !['+', '-'].includes(option)) {
+                embed
+                    .setTitle('Usage')
+                    .setDescription(
+                        '**.bvs [user] [action]** to add or remove inspection role\n\n**Actions:** [**+** or **-**]\n**Default:** +',
+                    )
+                    .setColor('#F08A5D');
+
+                return await message.channel.send({ embeds: [embed] });
+            }
+
+            const memberToValidate = message.guild.members.cache.get(memberId);
+
+            if (!memberToValidate) {
+                embed.setDescription('User not found!').setColor('#ff1744');
+
+                return await message.channel.send({ embeds: [embed] });
+            }
+
+            if (memberToValidate.roles.cache.has(inspectionRoleId) && option === '+') {
+                embed.setDescription(`<@${memberId}> already has inspection role`);
+
+                return await message.channel.send({ embeds: [embed] });
+            }
+
+            if (!memberToValidate.roles.cache.has(inspectionRoleId) && option === '-') {
+                embed.setDescription(`<@${memberId}> doesn't have inspection role`);
+
+                return await message.channel.send({ embeds: [embed] });
+            }
+
+            try {
+                if (option === '+') {
+                    await memberToValidate.roles.add(inspectionRoleId);
+
+                    embed.setDescription(`Added inspection role to <@${memberId}>`);
+                } else {
+                    await memberToValidate.roles.remove(inspectionRoleId);
+
+                    embed.setDescription(`Removed inspection role from <@${memberId}>`);
+                }
 
                 await message.channel.send({ embeds: [embed] });
             } catch (e) {
