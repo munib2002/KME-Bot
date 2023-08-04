@@ -95,7 +95,7 @@ const main = async () => {
             if (!memberId) {
                 embed.setTitle('Usage').setDescription('**.va [user]** to validate a user!').setColor('#F08A5D');
 
-                return await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+                return await message.channel.send({ embeds: [embed] });
             }
 
             const memberToValidate = message.guild.members.cache.get(memberId);
@@ -103,13 +103,13 @@ const main = async () => {
             if (!memberToValidate) {
                 embed.setDescription('User not found!').setColor('#ff1744');
 
-                return await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+                return await message.channel.send({ embeds: [embed] });
             }
 
             if (memberToValidate.roles.cache.has(validatedRoleId)) {
                 embed.setDescription(`<@${memberId}> is already validated!`);
 
-                return await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+                return await message.channel.send({ embeds: [embed] });
             }
 
             try {
@@ -119,11 +119,11 @@ const main = async () => {
                     `<@${memberId}> has been successfully validated for Pickups!\nHead over to <#${queueChannelId}> to play!`,
                 );
 
-                await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+                await message.channel.send({ embeds: [embed] });
             } catch (e) {
                 embed.setDescription(`Something went wrong! Contact <@${OWNER_ID}> for Help`).setColor('#ff1744');
 
-                await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+                await message.channel.send({ embeds: [embed] });
 
                 console.log(e);
             }
