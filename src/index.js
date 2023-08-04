@@ -5,6 +5,8 @@ import { COMMANDS } from './constants/commands';
 import { loadCommands } from './utils/discord.utils';
 
 const { OWNER_ID } = process.env;
+const adminRoleId = '1096354067850215544';
+const moderatorRoleId = '1095361485221404765';
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
@@ -72,7 +74,11 @@ const main = async () => {
         const command = args.shift().toLowerCase();
 
         if (command === 'va') {
-            if (message.author.id !== OWNER_ID)
+            if (
+                message.author.id !== OWNER_ID &&
+                !message.member.roles.cache.has(adminRoleId) &&
+                !message.member.roles.cache.has(moderatorRoleId)
+            )
                 return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
             // const validatedRoleId = '865990741754773534';
