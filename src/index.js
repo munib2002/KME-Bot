@@ -5,6 +5,8 @@ import { COMMANDS } from './constants/commands';
 import { loadCommands } from './utils/discord.utils';
 
 const { OWNER_ID } = process.env;
+
+const starRoleId = '1095679588740378624';
 const adminRoleId = '1096354067850215544';
 const moderatorRoleId = '1095361485221404765';
 
@@ -77,7 +79,8 @@ const main = async () => {
             if (
                 message.author.id !== OWNER_ID &&
                 !message.member.roles.cache.has(adminRoleId) &&
-                !message.member.roles.cache.has(moderatorRoleId)
+                !message.member.roles.cache.has(moderatorRoleId) &&
+                !message.member.roles.cache.has(starRoleId)
             )
                 return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
