@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import moment from 'moment';
 
 import { COMMANDS } from './constants/commands';
@@ -9,6 +9,9 @@ const { OWNER_ID } = process.env;
 const starRoleId = '1095679588740378624';
 const adminRoleId = '1096354067850215544';
 const moderatorRoleId = '1095361485221404765';
+
+// const queueChannelId = '826063908342595607';
+const queueChannelId = '1095360184559349820';
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
@@ -74,6 +77,8 @@ const main = async () => {
         const command = args.shift().toLowerCase();
 
         if (command === 'va') {
+            const embed = new EmbedBuilder().setTitle('Pickups Validation').setColor('#18ffff');
+
             if (
                 message.author.id !== OWNER_ID &&
                 !message.member.roles.cache.has(adminRoleId) &&
@@ -87,25 +92,39 @@ const main = async () => {
 
             const memberId = args[0]?.replace(/[<@!>]/g, '');
 
-            if (!memberId)
-                return await message.reply({
-                    content: 'Usage **.va [user]** to validate a user!',
-                    allowedMentions: { repliedUser: false },
-                });
+            if (!memberId) {
+                embed.setTitle('Usage').setDescription('**.va [user]** to validate a user!').setColor('#F08A5D');
+
+                return await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+            }
 
             const memberToValidate = message.guild.members.cache.get(memberId);
 
-            if (!memberToValidate) return await message.reply({ content: 'User not found!', allowedMentions: { repliedUser: false } });
+            if (!memberToValidate) {
+                embed.setDescription('User not found!').setColor('#ff1744');
 
-            if (memberToValidate.roles.cache.has(validatedRoleId))
-                return await message.reply({ content: 'User already validated!', allowedMentions: { repliedUser: false } });
+                return await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+            }
+
+            if (memberToValidate.roles.cache.has(validatedRoleId)) {
+                embed.setDescription(`<@${memberId}> is already validated!`);
+
+                return await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+            }
 
             try {
                 await memberToValidate.roles.add(validatedRoleId);
 
-                await message.reply({ content: `<@${memberId}> validated for Pickups!`, allowedMentions: { repliedUser: false } });
+                embed.setDescription(
+                    `<@${memberId}> has been successfully validated for Pickups!\nHead over to <#${queueChannelId}> to play!`,
+                );
+
+                await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
             } catch (e) {
-                await message.reply({ content: 'Not enough permissions!', allowedMentions: { repliedUser: false } });
+                embed.setDescription(`Something went wrong! Contact <@${OWNER_ID}> for Help`).setColor('#ff1744');
+
+                await message.reply({ embeds: [embed], allowedMentions: { repliedUser: false } });
+
                 console.log(e);
             }
         }
