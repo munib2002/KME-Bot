@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import moment from 'moment';
 
 import { COMMANDS } from './constants/commands';
@@ -92,8 +92,6 @@ const main = async () => {
             const command = args.shift().toLowerCase();
 
             if (command === 'va') {
-                const embed = new EmbedBuilder().setTitle('Pickups Validation').setColor('#18ffff');
-
                 if (
                     message.author.id !== OWNER_ID &&
                     !message.member.roles.cache.has(adminRoleId) &&
@@ -102,43 +100,14 @@ const main = async () => {
                 )
                     return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
-                const memberId = args[0]?.replace(/[<@!>]/g, '');
-
-                if (!memberId) {
-                    embed.setTitle('Usage').setDescription('**.va [user]** to validate a user').setColor('#F08A5D');
-
-                    return await message.channel.send({ embeds: [embed] });
-                }
-
-                const memberToValidate = message.guild.members.cache.get(memberId);
-
-                if (!memberToValidate) {
-                    embed.setDescription('User not found!').setColor('#ff1744');
-
-                    return await message.channel.send({ embeds: [embed] });
-                }
-
-                if (memberToValidate.roles.cache.has(validatedRoleId)) {
-                    embed.setDescription(`<@${memberId}> is already validated`);
-
-                    return await message.channel.send({ embeds: [embed] });
-                }
-
-                try {
-                    await memberToValidate.roles.add(validatedRoleId);
-
-                    embed.setDescription(
-                        `<@${memberId}> has been successfully validated for Pickups!\nHead over to <#${queueChannelId}> to play!`,
-                    );
-
-                    await message.channel.send({ embeds: [embed] });
-                } catch (e) {
-                    embed.setDescription(`Something went wrong! Contact <@${OWNER_ID}> for Help`).setColor('#ff1744');
-
-                    await message.channel.send({ embeds: [embed] });
-
-                    console.log(e);
-                }
+                await addRoleCommand(message, args, validatedRoleId, {
+                    main: {
+                        title: 'Pickups Validation',
+                        added: `{user} has been successfully validated for Pickups!\nHead over to <#${queueChannelId}> to play!`,
+                    },
+                    usage: '**.va [user]** to validate a user',
+                    exists: '{user} is already validated',
+                });
             }
 
             if (command === 'bl') {
