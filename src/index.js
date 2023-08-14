@@ -1,5 +1,6 @@
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import moment from 'moment';
+import ms from 'ms';
 
 import { COMMANDS } from './constants/commands';
 import { loadCommands } from './utils/discord.utils';
@@ -16,6 +17,10 @@ const validatedRoleId = process.env.VALIDATED_ROLE_ID || '1095363733750022197';
 const blacklistedRoleId = process.env.BLACKLISTED_ROLE_ID || '1095640720456564736';
 const inspectionRoleId = process.env.INSPECTION_ROLE_ID || '1119157862044807208';
 const imagePermsRoleId = process.env.IMAGE_PERMS_ROLE_ID || '1103609890146095126';
+const logsChannelId = process.env.LOGS_CHANNEL_ID || '1095639689383387159';
+
+const devServerId = '826063908342595604';
+const devLogsChannelId = '1124369895254147274';
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
@@ -177,6 +182,93 @@ const main = async () => {
                     },
                     true,
                 );
+            }
+
+            if (command === 'mute') {
+                if (
+                    message.author.id !== OWNER_ID &&
+                    !message.member.roles.cache.has(adminRoleId) &&
+                    !message.member.roles.cache.has(moderatorRoleId) &&
+                    !message.member.roles.cache.has(starRoleId)
+                )
+                    return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
+
+                const embed = new EmbedBuilder().setTitle('Mute').setColor('#18ffff');
+
+                const memberId = args[0]?.replace(/[<@!>]/g, '');
+                const duration = args[1];
+                const reason = args.slice(2).join(' ') || 'No Reason Provided';
+
+                if (!memberId) {
+                    embed.setTitle('Usage').setDescription('**.mute [user] [duration] [reason]** to mute a user').setColor('#F08A5D');
+
+                    return await message.channel.send({ embeds: [embed] });
+                }
+
+                const member = message.guild.members.cache.get(memberId);
+
+                if (!member) {
+                    embed.setDescription('User not found!').setColor('#ff1744');
+
+                    return await message.channel.send({ embeds: [embed] });
+                }
+
+                if (!duration) {
+                    embed.setDescription('Duration Not Specified!').setColor('#ff1744');
+
+                    return await message.channel.send({ embeds: [embed] });
+                }
+
+                if (!duration.match(/^[1-9][0-9]*[dhms]$/i) || !ms(duration)) {
+                    embed.setDescription('Invalid Duration!').setColor('#ff1744');
+
+                    return await message.channel.send({ embeds: [embed] });
+                }
+
+                try {
+                    if (!member.moderatable) {
+                        embed.setDescription('I cannot mute this user!').setColor('#ff1744');
+
+                        return await message.channel.send({ embeds: [embed] });
+                    }
+
+                    await message.delete().catch(console.error);
+
+                    await member.timeout(ms(duration), reason);
+
+                    embed
+                        .setDescription(`Muted <@${memberId}> for ${ms(ms(duration), { long: true })}!`)
+                        .addFields({ name: 'Reason', value: reason })
+                        .setColor('#18ffff');
+
+                    await message.channel.send({ embeds: [embed] });
+
+                    const logsChannel = message.guild.channels.cache.get(logsChannelId);
+
+                    const logsEmbed = new EmbedBuilder()
+                        .setTitle('Mute')
+                        .setDescription(`Muted <@${memberId}> for ${ms(ms(duration), { long: true })}!`)
+                        .addFields(
+                            { name: 'Reason', value: reason, inline: true },
+                            { name: 'Moderator', value: `<@${message.author.id}>`, inline: true },
+                        )
+                        .setColor('#18ffff');
+
+                    if (logsChannel && logsChannel.sendable) {
+                        await logsChannel.send({ embeds: [logsEmbed] });
+                    }
+
+                    const devServer = client.guilds.cache.get(devServerId);
+                    const devLogsChannel = devServer.channels.cache.get(devLogsChannelId);
+
+                    devLogsChannel.send({ embeds: [logsEmbed] }).catch(console.error);
+                } catch (e) {
+                    embed.setDescription(`Something went wrong! Contact <@${process.env.OWNER_ID}> for Help`).setColor('#ff1744');
+
+                    await message.channel.send({ embeds: [embed] });
+
+                    console.log(e);
+                }
             }
         } catch (e) {
             console.log(e);
