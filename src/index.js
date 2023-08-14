@@ -254,8 +254,8 @@ const main = async () => {
                         )
                         .setColor('#18ffff');
 
-                    if (logsChannel && logsChannel.sendable) {
-                        await logsChannel.send({ embeds: [logsEmbed] });
+                    if (logsChannel) {
+                        await logsChannel.send({ embeds: [logsEmbed] }).catch(console.error);
                     }
 
                     const devServer = client.guilds.cache.get(devServerId);
