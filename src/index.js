@@ -19,8 +19,6 @@ const inspectionRoleId = process.env.INSPECTION_ROLE_ID || '1119157862044807208'
 const imagePermsRoleId = process.env.IMAGE_PERMS_ROLE_ID || '1103609890146095126';
 const logsChannelId = process.env.LOGS_CHANNEL_ID || '1095639689383387159';
 
-const KMEGuildId = '1095356695561113740';
-
 const devServerId = '826063908342595604';
 const devLogsChannelId = '1124369895254147274';
 
@@ -283,28 +281,19 @@ const main = async () => {
 
                 const embed = new EmbedBuilder().setTitle('Say').setColor('#18ffff');
 
-                const guildId = args[0]?.replace(/[<@!>]/g, '') === '.' ? KMEGuildId : args[0]?.replace(/[<@!>]/g, '');
-                const channelId = args[1]?.replace(/[<#>]/g, '') === '.' ? queueChannelId : args[1]?.replace(/[<#>]/g, '');
-                const content = args.slice(2).join(' ');
+                const channelId = args[0]?.replace(/[<#>]/g, '') === '.' ? queueChannelId : args[0]?.replace(/[<#>]/g, '');
+                const content = args.slice(1).join(' ');
 
-                if (!guildId || !channelId || !content) {
+                if (!channelId || !content) {
                     embed
                         .setTitle('Usage')
-                        .setDescription('**.say [guild] [channel] [content]** to send a message to a channel')
+                        .setDescription('**.say [channel] [content]** to send a message to a channel')
                         .setColor('#F08A5D');
 
                     return await message.channel.send({ embeds: [embed] });
                 }
 
-                const guild = client.guilds.cache.get(guildId);
-
-                if (!guild) {
-                    embed.setDescription('Guild not found!').setColor('#ff1744');
-
-                    return await message.channel.send({ embeds: [embed] });
-                }
-
-                const channel = guild.channels.cache.get(channelId);
+                const channel = client.channels.cache.get(channelId);
 
                 if (!channel) {
                     embed.setDescription('Channel not found!').setColor('#ff1744');
