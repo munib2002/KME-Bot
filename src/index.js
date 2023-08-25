@@ -90,7 +90,7 @@ const main = async () => {
 
     client.on('messageCreate', async message => {
         try {
-            if (message.author.bot) return;
+            if (message.author.bot && message.author.id !== client.user.id) return;
 
             if (!message.content.startsWith(prefix)) return;
 
