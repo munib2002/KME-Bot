@@ -103,7 +103,8 @@ const main = async () => {
                     message.author.id !== OWNER_ID &&
                     !message.member.roles.cache.has(adminRoleId) &&
                     !message.member.roles.cache.has(moderatorRoleId) &&
-                    !message.member.roles.cache.has(starRoleId)
+                    !message.member.roles.cache.has(starRoleId) &&
+                    message.author.id !== client.user.id
                 )
                     return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
@@ -122,7 +123,8 @@ const main = async () => {
                     message.author.id !== OWNER_ID &&
                     !message.member.roles.cache.has(adminRoleId) &&
                     !message.member.roles.cache.has(moderatorRoleId) &&
-                    !message.member.roles.cache.has(starRoleId)
+                    !message.member.roles.cache.has(starRoleId) &&
+                    message.author.id !== client.user.id
                 )
                     return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
@@ -141,7 +143,8 @@ const main = async () => {
                     message.author.id !== OWNER_ID &&
                     !message.member.roles.cache.has(adminRoleId) &&
                     !message.member.roles.cache.has(moderatorRoleId) &&
-                    !message.member.roles.cache.has(starRoleId)
+                    !message.member.roles.cache.has(starRoleId) &&
+                    message.author.id !== client.user.id
                 )
                     return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
@@ -166,7 +169,8 @@ const main = async () => {
                     message.author.id !== OWNER_ID &&
                     !message.member.roles.cache.has(adminRoleId) &&
                     !message.member.roles.cache.has(moderatorRoleId) &&
-                    !message.member.roles.cache.has(starRoleId)
+                    !message.member.roles.cache.has(starRoleId) &&
+                    message.author.id !== client.user.id
                 )
                     return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
@@ -191,7 +195,8 @@ const main = async () => {
                     message.author.id !== OWNER_ID &&
                     !message.member.roles.cache.has(adminRoleId) &&
                     !message.member.roles.cache.has(moderatorRoleId) &&
-                    !message.member.roles.cache.has(starRoleId)
+                    !message.member.roles.cache.has(starRoleId) &&
+                    message.author.id !== client.user.id
                 )
                     return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
 
