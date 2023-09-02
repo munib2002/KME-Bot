@@ -15,6 +15,7 @@ const moderatorRoleId = '1095361485221404765';
 const queueChannelId = process.env.QUEUE_CHANNEL_ID || '1095360184559349820';
 const validatedRoleId = process.env.VALIDATED_ROLE_ID || '1095363733750022197';
 const blacklistedRoleId = process.env.BLACKLISTED_ROLE_ID || '1095640720456564736';
+const htrRoleId = process.env.HTR_ROLE_ID || '1126526191671705600';
 const inspectionRoleId = process.env.INSPECTION_ROLE_ID || '1119157862044807208';
 const imagePermsRoleId = process.env.IMAGE_PERMS_ROLE_ID || '1103609890146095126';
 const logsChannelId = process.env.LOGS_CHANNEL_ID || '1095639689383387159';
@@ -133,6 +134,26 @@ const main = async () => {
                     },
                     usage: '**.bl [user]** to blacklist a user',
                     exists: '{user} is already blacklisted',
+                });
+            }
+
+            if (command === 'htr') {
+                if (
+                    message.author.id !== OWNER_ID &&
+                    !message.member.roles.cache.has(adminRoleId) &&
+                    !message.member.roles.cache.has(moderatorRoleId) &&
+                    !message.member.roles.cache.has(starRoleId) &&
+                    message.author.id !== client.user.id
+                )
+                    return await message.reply({ content: 'No! :smiling_imp:', allowedMentions: { repliedUser: false } });
+
+                await addRoleCommand(message, args, htrRoleId, {
+                    main: {
+                        title: 'Have To Record',
+                        added: 'Added HTR role to {user}',
+                    },
+                    usage: '**.htr [user]** to add HTR role to a user',
+                    exists: '{user} already has HTR role',
                 });
             }
 
