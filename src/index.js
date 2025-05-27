@@ -1,6 +1,7 @@
-import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
+import { Client, EmbedBuilder, GatewayIntentBits } from 'discord.js';
 import moment from 'moment';
 import ms from 'ms';
+import util from 'util';
 
 import { COMMANDS } from './constants/commands';
 import { loadCommands } from './utils/discord.utils';
@@ -81,6 +82,12 @@ const main = async () => {
                 if (!userID) return await interaction.reply('Usage **/fban @user** to ban a user!');
 
                 await interaction.reply(`<@${interaction.options.get('user').value}> has been banned from the server!`);
+            }
+
+            if (interaction.commandName === COMMANDS.EMOTE) {
+                const emote = interaction.options.get('emote')?.value;
+
+                console.log(emote);
             }
         } catch (e) {
             console.log(e);
@@ -334,6 +341,59 @@ const main = async () => {
                     await message.channel.send({ embeds: [embed] });
 
                     console.log(e);
+                }
+            }
+
+            if (command === 'c_emoji') {
+                // if (message.author.id !== OWNER_ID && message.author.id !== '735800926501208064') return;
+                // const embed = new EmbedBuilder().setTitle('Custom Emoji').setColor('#18ffff');
+                // const guildId = args[0] === '.' ? message.guild.id : args[0];
+                // const emojis = [];
+                // let emojisToParse = args.slice(1).filter(c => (/^<a?:.+?:\d+?>$/.test(c) ? emojis.push(c) && false : true));
+                // if (!guildId) {
+                //     embed
+                //         .setTitle('Usage')
+                //         .setDescription('**.c_emoji [guildId] [emoji_1] [emoji_2]...** to create custom emojis')
+                //         .setColor('#F08A5D');
+                //     return await message.channel.send({ embeds: [embed] });
+                // }
+                // try {
+                //     for (const emojiToParse of emojisToParse) {
+                //         if (!/^:.+?:$/.test(emojiToParse)) continue;
+                //         const emojiName = emojiToParse.split(':')[1];
+                //         const emoji = client.emojis.cache.find(c => {
+                //             if (c.name === emojiName) return c;
+                //         });
+                //         const emojiBuffer = await (await fetch(emojiUrl)).buffer();
+                //         const emojiCreated = await client.guilds.cache.get(guildId).emojis.create(emojiBuffer, emojiName);
+                //         emojisToParse = emojisToParse.filter(c => c !== emojiToParse);
+                //         emojisToParse.push(`<:${emojiName}:${emojiCreated.id}>`);
+                //     }
+                //     console.log(emojisToParse);
+                // } catch (e) {
+                //     embed.setDescription(`Something went wrong! Contact <@${process.env.OWNER_ID}> for Help`).setColor('#ff1744');
+                //     await message.channel.send({ embeds: [embed] });
+                //     console.log(e);
+                // }
+            }
+
+            if (command === 'code') {
+                if (message.author.id !== OWNER_ID) return;
+
+                const code = message.content.slice(5).trim();
+
+                try {
+                    let result = await eval(code);
+
+                    if (typeof result !== 'string') {
+                        result = util.inspect(result, { depth: 0 });
+                    }
+
+                    if (result.length > 1900) result = result.slice(0, 1900) + '...';
+
+                    await message.channel.send('```js\n' + result + '\n```');
+                } catch (e) {
+                    await message.channel.send('```js\n' + JSON.stringify({ message: e?.message, error: e.toString() }) + '\n```');
                 }
             }
         } catch (e) {
